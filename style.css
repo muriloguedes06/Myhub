@@ -1,25 +1,52 @@
 /*
-margin: auto -> não se aplica ao display: inline>
-deve ser transformado em display-block para utiliza-lo em certos casos.
-ou utilizado no Parent o text-align.
+  Observação sobre margin:auto vs display:inline:
+  - Elementos com display:inline ignoram width/height e margin horizontal auto.
+  - Para centralizar um elemento com margin:auto, ele precisa ser "caixa de bloco":
+      display:block (ou flex/grid, etc.) + largura definida (ou max-width).
+  - Alternativas quando o filho é inline:
+      • Tornar o filho display:block; ou
+      • Centralizar no PAI usando text-align:center; (funciona para inline/inline-block).
 */
 
+/* RESET BÁSICO: zera espaçamentos padrões do navegador e adota o modelo de caixa consistente */
 * {
-  padding: 0;
-  margin: 0;
-  box-sizing: border-box;
+  padding: 0; /* remove qualquer padding padrão */
+  margin: 0; /* remove qualquer margin padrão */
+  box-sizing: border-box; /* inclui padding e border no cálculo de width/height */
 }
 
+/* =========================
+   VARIÁVEIS (CSS Custom Properties)
+   =========================
+   :root define as variáveis "tema escuro" padrão.
+   Podem ser sobrescritas em qualquer escopo (ex.: classe .light abaixo).
+*/
 :root {
-  --text_color: white;
-  --bg-url: url(./assets/bg-mobile.jpg);
-  --stroke-color: rgba(255, 255, 255, 0.5);
-  --surface-color: rgba(255, 255, 255, 0.1);
-  --surface-color-hover: rgba(255, 255, 255, 0.2);
-  --highlight--color: rgba(255, 255, 255, 0.2);
-  --switch-bg: url(./assets/moon-stars.svg);
+  --text_color: white; /* cor padrão do texto */
+  --bg-url: url(./assets/bg-mobile.jpg); /* imagem de fundo padrão (mobile) */
+  --stroke-color: rgba(
+    255,
+    255,
+    255,
+    0.5
+  ); /* cor de bordas/contornos translúcida */
+  --surface-color: rgba(
+    255,
+    255,
+    255,
+    0.1
+  ); /* cor de superfícies (cards, botões) */
+  --surface-color-hover: rgba(255, 255, 255, 0.2); /* cor ao passar o mouse */
+  --highlight--color: rgba(
+    255,
+    255,
+    255,
+    0.2
+  ); /* realce (ex.: outline no :hover) */
+  --switch-bg: url(./assets/moon-stars.svg); /* ícone do botão do switch (tema escuro) */
 }
 
+/* Tema claro: sobrescreve as variáveis para inverter o contraste */
 .light {
   --text_color: black;
   --bg-url: url(./assets/bg-mobile-light.jpg);
@@ -27,178 +54,230 @@ ou utilizado no Parent o text-align.
   --surface-color: rgba(0, 0, 0, 0.1);
   --surface-color-hover: rgba(0, 0, 0, 0.2);
   --highlight--color: rgba(0, 0, 0, 0.1);
-  --switch-bg: url(./assets/sun.svg);
+  --switch-bg: url(./assets/sun.svg); /* ícone do botão do switch (tema claro) */
 }
 
+/* =========================
+   BODY (fundo e tipografia global)
+   ========================= */
 body {
-  background-image: var(--bg-url);
-  background-repeat: no-repeat;
-  background-position: top center;
-  background-size: cover;
-  height: 100vh;
+  background-image: var(
+    --bg-url
+  ); /* usa a imagem definida nas variáveis do tema */
+  background-repeat: no-repeat; /* evita repetição da imagem */
+  background-position: top center; /* ancora a imagem no topo central */
+  background-size: cover; /* cobre toda a viewport mantendo proporção */
+  height: 100vh; /* garante que o body tenha altura da viewport */
 }
 
+/* Herdar fonte e cor para todos os elementos dentro do body
+   (prático para não repetir "color" em cada componente) */
 body * {
-  font-family: "Inter", sans-serif;
-  color: var(--text_color);
+  font-family: "Inter", sans-serif; /* família tipográfica global */
+  color: var(--text_color); /* cor do texto baseada no tema atual */
 }
 
+/* =========================
+   CONTAINER CENTRAL
+   ========================= */
 #container {
-  width: 100%;
-  max-width: 588px;
-  /* Se o margin tem quatro chamadas serão seguidas na lista: top, right, bottom, left */
-  margin: 150px auto 0px;
-  padding: 0 24px;
+  width: 100%; /* ocupa toda a largura disponível até atingir o max-width */
+  max-width: 588px; /* limita a largura máxima (bom para leitura em telas grandes) */
+  /* margin com 4 valores = top, right, bottom, left */
+  margin: 50px auto 0px; /* 150px topo, auto nas laterais (centraliza), 0px abaixo */
+  padding: 0 24px; /* respiro horizontal interno */
 }
 
-/* profile */
-
+/* =========================
+   PROFILE (avatar + nome)
+   ========================= */
 #profile {
-  text-align: center;
-  padding: 24px;
+  text-align: center; /* centraliza conteúdo inline/inline-block (ex.: <img>, <p>) */
+  padding: 24px; /* respiro interno */
 }
 
 #profile img {
-  width: 112px;
+  width: 112px; /* tamanho fixo do avatar (a altura acompanha proporcionalmente) */
 }
 
 #profile p {
-  font-weight: 500;
-  line-height: 24px;
+  font-weight: 500; /* semi-negrito para destaque sutil do nome/descrição */
+  line-height: 24px; /* altura da linha para melhor legibilidade */
 }
 
-/* switch */
+/* =========================
+   SWITCH (botão de alternância de tema)
+   Estrutura esperada:
+   <div id="switch">
+     <button></button>
+     <span></span>
+   </div>
+   ========================= */
 #switch {
-  position: relative;
-  width: 64px;
-  margin: 4px auto;
+  position: relative; /* cria um contexto para posicionamento absoluto do botão */
+  width: 64px; /* largura total do "trilho" (span) */
+  margin: 4px auto; /* centraliza horizontalmente (o elemento é block por padrão) */
 }
 
 #switch button {
-  width: 32px;
+  width: 32px; /* diâmetro do botão circular */
   height: 32px;
-  background: white;
-  border: 0;
-  border-radius: 50%;
-  background-image: var(--switch-bg);
+  background: white; /* cor do botão */
+  border: 0; /* remove borda nativa */
+  border-radius: 50%; /* torna o botão circular */
+  background-image: var(--switch-bg); /* ícone (lua/sol) conforme tema */
   background-repeat: no-repeat;
-  background-position: center;
-  left: 0;
+  background-position: center; /* centraliza o ícone dentro do botão */
+  left: 0; /* posição inicial do botão no trilho */
 
-  position: absolute;
-  z-index: 1;
-  transform: translateY(-50%);
-  top: 50%;
-  animation: slide-out 0.2s;
+  position: absolute; /* posicionamento em relação ao #switch (pai relative) */
+  z-index: 1; /* fica acima do trilho (span) */
+  transform: translateY(
+    -50%
+  ); /* move o botão metade da própria altura para alinhar no centro vertical */
+  top: 50%; /* ancora verticalmente no meio do trilho */
+  animation: slide-out 0.2s; /* animação padrão (tema escuro -> botão à esquerda) */
 }
 
 #switch span {
-  display: block;
-  width: 64px;
-  height: 24px;
-  background: var(--surface-color);
-  border: 1px solid var(--stroke-color);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  border-radius: 9999px;
+  display: block; /* trilho vira bloco para aceitar width/height */
+  width: 64px; /* largura do trilho (mesma do #switch) */
+  height: 24px; /* altura menor que o botão para criar bordas aparentes */
+  background: var(--surface-color); /* cor de fundo translúcida do trilho */
+  border: 1px solid var(--stroke-color); /* contorno do trilho */
+  backdrop-filter: blur(
+    4px
+  ); /* aplica desfoque ao que está "atrás" (suporte variável) */
+  -webkit-backdrop-filter: blur(4px); /* prefixo para Safari */
+  border-radius: 9999px; /* bordas extremamente arredondadas (pílula) */
 }
 
 #switch button:hover {
-  outline: 8px solid var(--highlight--color);
+  outline: 8px solid var(--highlight--color); /* anel de foco ao passar o mouse (efeito de destaque) */
 }
 
+/* Quando a classe .light está no documento, anima o botão para a direita */
 .light #switch button {
-  animation: slide-in 0.2s forwards;
+  animation: slide-in 0.2s forwards; /* 'forwards' mantém o estado final (left:50%) após a animação */
 }
 
-/* Links */
-
+/* =========================
+   LISTA DE LINKS (menus / botões)
+   Estrutura esperada:
+   <ul>
+     <li><a href="#">Texto</a></li>
+     ...
+   </ul>
+   ========================= */
 ul {
-  list-style: none;
-
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: 24px 0;
+  list-style: none; /* remove marcadores de lista (bolinhas) */
+  display: flex; /* usa flexbox para empilhar ou alinhar filhos */
+  flex-direction: column; /* empilha os <li> verticalmente */
+  gap: 16px; /* espaçamento consistente entre os itens (moderno e sem margem colapsada) */
+  padding: 24px 0; /* respiro vertical da seção */
 }
 
 ul li a {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 16px 24px;
-  background: var(--surface-color);
-  backdrop-filter: blur(4px);
+  display: flex; /* transforma o link em "botão flex" */
+  align-items: center; /* alinha conteúdo verticalmente ao centro */
+  justify-content: center; /* centraliza conteúdo horizontalmente */
+  padding: 16px 24px; /* área clicável confortável */
+  background: var(--surface-color); /* fundo translúcido */
+  backdrop-filter: blur(4px); /* efeito glassmorphism leve */
   -webkit-backdrop-filter: blur(4px);
-  border: 1px solid var(--stroke-color);
-  border-radius: 8px;
+  border: 1px solid var(--stroke-color); /* contorno sutil */
+  border-radius: 8px; /* cantos arredondados */
 
-  font-weight: 500;
-  text-decoration: none;
+  font-weight: 500; /* texto com leve destaque */
+  text-decoration: none; /* remove sublinhado padrão */
 
-  transition: background 0.5s;
+  transition: background 0.5s; /* suaviza a mudança de fundo no :hover */
 }
 
 ul li a:hover {
-  background: var(--surface-color-hover);
-  border: 1.5px solid var(--text_color);
+  background: var(--surface-color-hover); /* aumenta a opacidade ao pairar */
+  border: 1.5px solid var(--text_color); /* borda um pouco mais forte no hover */
 }
 
-/* social links */
-
+/* =========================
+   SOCIAL LINKS (ícones redondos)
+   ========================= */
 #social-links {
-  display: flex;
-  justify-content: center;
-  padding: 24px 0;
-  font-size: 24px;
+  display: flex; /* coloca os ícones em linha */
+  justify-content: center; /* centraliza o grupo */
+  padding: 24px 0; /* respiro vertical */
+  font-size: 24px; /* tamanho base dos ícones (se forem fontes como FontAwesome) */
 }
 
 #social-links a {
-  display: flex;
+  display: flex; /* facilita centralizar o ícone dentro da bolinha */
   align-items: center;
   justify-content: center;
-  padding: 16px;
-  transition: background 0.2s;
-  border-radius: 50%;
+  padding: 16px; /* aumenta a área clicável */
+  transition: background 0.2s; /* transição rápida para o hover */
+  border-radius: 50%; /* formato circular */
 }
 
 #social-links a:hover {
-  background: var(--highlight--color);
+  background: var(
+    --highlight--color
+  ); /* bolinha ganha fundo translúcido ao pairar */
 }
 
-/* footer */
+/* =========================
+   RODAPÉ
+   ========================= */
 footer {
-  padding: 24px 0;
-  text-align: center;
-  font-size: 14px;
+  padding: 24px 0; /* respiro vertical */
+  text-align: center; /* centraliza o texto do rodapé */
+  font-size: 14px; /* fonte um pouco menor */
 }
 
-/* header */
-
+/* =========================
+   HEADER FIXO (sticky)
+   Estrutura típica:
+   <header>
+     <h1>Logo</h1>
+     <nav>...links...</nav>
+     <!-- ou um <a> único/com botão -->
+   </header>
+   ========================= */
 header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 3rem;
-  background: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(6px);
-  box-shadow: 0 2px 12px rgba(56, 26, 35, 0.473);
-  position: sticky;
-  top: 0;
-  z-index: 1000;
+  display: flex; /* ativa layout flexível em linha */
+  justify-content: space-between; /* logo à esquerda, nav/ações à direita (se houver 2 filhos) */
+  align-items: center; /* centraliza verticalmente os filhos na barra */
+  padding: 1rem 3rem; /* respiro interno (vertical, horizontal) */
+  background: rgba(0, 0, 0, 0.85); /* fundo escuro translúcido */
+  backdrop-filter: blur(6px); /* desfoque de fundo (efeito vidro) */
+  box-shadow: 0 2px 12px rgba(56, 26, 35, 0.473); /* sombra sutil abaixo do header */
+  position: sticky; /* fixa no topo ao rolar (quando atinge top:0) */
+  top: 0; /* posição de "cola" no topo da viewport */
+  z-index: 1000; /* garante que fique acima de outros elementos */
 }
 
+/*
+  Dica importante:
+  - Em um container flex, aplicar margin-left:auto no filho empurra-o para a direita.
+  - Aqui, se houver apenas UM <a> dentro do header (sem <nav>), ele vai grudar à direita.
+  - Se você tiver <nav> com vários links e quiser tudo à direita:
+      header { display:flex; }
+      header .logo { nada  }
+      header nav { margin-left:auto; }
+*/
 header a {
-  margin-left: auto;
-  margin-right: 1px;
-  text-decoration: none;
+  margin-left: auto; /* empurra ESTE link para a direita em contexto flex */
+  margin-right: 1px; /* pequeno ajuste à borda direita */
+  text-decoration: none; /* remove sublinhado */
 }
 
 header a:hover {
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.5); /* muda a cor do texto no hover */
 }
 
-/* media queries */
+/* =========================
+   MEDIA QUERIES (responsivo)
+   A partir de 700px de largura de viewport, troca as imagens de fundo para versões desktop.
+   ========================= */
 @media (min-width: 700px) {
   :root {
     --bg-url: url(./assets/bg-desktop.jpg);
@@ -209,22 +288,26 @@ header a:hover {
   }
 }
 
-/* keyframes */
-
+/* =========================
+   ANIMAÇÕES (keyframes) do botão do switch
+   - slide-in: move o botão da esquerda para a metade direita do trilho (50%).
+   - slide-out: volta da metade para a esquerda.
+   Observação: aqui usamos 'left' como propriedade animada.
+   ========================= */
 @keyframes slide-in {
   from {
-    left: 0;
+    left: 0; /* começa encostado à esquerda */
   }
   to {
-    left: 50%;
+    left: 50%; /* termina no meio do trilho (como o botão tem 32px e o trilho 64px, fica alinhado visualmente) */
   }
 }
 
 @keyframes slide-out {
   from {
-    left: 50%;
+    left: 50%; /* começa do meio (estado do tema claro) */
   }
   to {
-    left: 0;
+    left: 0; /* volta para a esquerda (estado do tema escuro) */
   }
 }
